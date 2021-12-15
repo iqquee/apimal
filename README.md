@@ -1,2 +1,2 @@
 # APIMAL
-### This API is aimed to provide lots of informaions about almost all the animals available
+### Although still in the development phase, this API is aimed to provide lots of informaions about almost all the animals available so that whoever needs these information could get it at ease. Also, it is aimed to be provided for free to anyone who wished to use it.
