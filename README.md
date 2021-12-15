@@ -1,3 +1,3 @@
 # APIMAL
 ### Although still in the development phase, this API is aimed to provide lots of informaions about almost all the animals available so that whoever needs these information could get it at ease. Also, it is aimed to be provided for free to anyone who wished to use it.
-#### Right now, its opened as anyone can populate the database with the information of any animals of their choice without having to get a secret key whatsoevery but this might change soon as i feel there is need for proper regulation else some datas which are not valid could be added to the database and then used but some other persons.
+#### Right now, its opened as anyone can populate the database with the information of any animals of their choice without having to get a secret key whatsoevery but this might change soon as i feel there is need for proper regulation else some datas which are not valid/relevant could be added to the database and then used but some other persons.
