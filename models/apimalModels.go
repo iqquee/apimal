@@ -19,6 +19,7 @@ type Animal struct {
 	Genus               string             `json:"genus"`
 	Specie              string             `json:"specie"`
 	Color               string             `json:"color"`
+	Predator            []string           `json:"predator"`
 	FoodType            []string           `json:"food_type"`
 	OvuationPeriod      string             `json:"ovulation_period"`
 	GestationPeriod     string             `json:"gestation_period"`
@@ -28,4 +29,5 @@ type Animal struct {
 	Motility            string             `json:"motility"`
 	MatingSeason        string             `json:"mating_season"`
 	ModeOfBirth         string             `json:"mode_of_birth"`
+	Animal_id           string             `json:"animal_id"`
 }
