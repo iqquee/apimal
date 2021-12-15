@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
+	"github.com/hisyntax/apimal/controllers"
 )
 
 func InitRouters() {
@@ -13,12 +14,13 @@ func InitRouters() {
 		port = "3000"
 	}
 
-	routers := gin.Default()
-	animal := routers.Group("/animal")
+	router := gin.Default()
+	animal := router.Group("/animal")
 	{
-		animal.POST("/create")
-		animal.GET("/animal/animals")
-		animal.GET("/animal/:animal_id")
-		animal.GET("/animal?search=")
+		animal.POST("/create", controllers.CreateHandler)
+		animal.GET("/animals")
+		animal.GET("/:animal_id")
 	}
+
+	router.Run(":" + port)
 }

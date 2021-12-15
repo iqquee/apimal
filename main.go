@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 
+	"github.com/hisyntax/apimal/routers"
 	"github.com/joho/godotenv"
 )
 
@@ -13,5 +14,5 @@ func init() {
 }
 
 func main() {
-
+	routers.InitRouters()
 }
