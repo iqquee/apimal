@@ -22,6 +22,7 @@ func InitRouters() {
 		animal.GET("/:animal_id", controllers.GetAnimalHandler)
 		animal.PUT("/:animal_id", controllers.UpdateAnimalHandler)
 		animal.DELETE("/:animal_id", controllers.DeleteAnimalHandler)
+		animal.GET("/", controllers.SearchAnimalHandler)
 	}
 
 	router.Run(":" + port)

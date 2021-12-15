@@ -100,9 +100,9 @@ func CreateAnimalHandler(c *gin.Context) {
 }
 
 func GetAnimalsHandler(c *gin.Context) {
-	//opens a database connection
+	//open up a dataase connection
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	//close that connection after user
+	//close that connection on the insertion is done
 	defer cancel()
 
 	//declear an aniamls variable ro hold an array of the animal model
@@ -144,10 +144,15 @@ func GetAnimalsHandler(c *gin.Context) {
 }
 
 func GetAnimalHandler(c *gin.Context) {
+	//open up a dataase connection
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	//close that connection on the insertion is done
 	defer cancel()
 
+	//declear a variable which holds the animal model
 	var animal models.Animal
+
+	//get the url parameter and throw an error if its empty
 	animal_id := c.Param("animal_id")
 	if animal_id == "" {
 		msg := "Invalid parameter"
@@ -156,6 +161,9 @@ func GetAnimalHandler(c *gin.Context) {
 		})
 		return
 	}
+
+	// match animal_id gotter from the url with the animal_id in the database
+	//and chek if there is an error
 	animals_id, err := primitive.ObjectIDFromHex(animal_id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -164,6 +172,8 @@ func GetAnimalHandler(c *gin.Context) {
 		return
 	}
 
+	//query through the database to get a match for the animal_if from the url
+	//and check for an error
 	animalResult := animalCollection.FindOne(ctx, bson.M{"_id": animals_id})
 	if err := animalResult.Err(); err != nil {
 		c.JSON(http.StatusNotFound, gin.H{
@@ -172,6 +182,8 @@ func GetAnimalHandler(c *gin.Context) {
 		return
 	}
 
+	//if there is a match, then decode it to the decleared animal variavle
+	//and if an error was ecountered while decoding, handle the error
 	if err := animalResult.Decode(&animal); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
@@ -179,6 +191,7 @@ func GetAnimalHandler(c *gin.Context) {
 		return
 	}
 
+	//if everything goes well, display the individual animal with matches the animal_id
 	c.JSON(http.StatusOK, gin.H{
 		"animal": animal,
 	})
@@ -186,11 +199,13 @@ func GetAnimalHandler(c *gin.Context) {
 }
 
 func UpdateAnimalHandler(c *gin.Context) {
+	//open up a dataase connection
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	//close that connection on the insertion is done
 	defer cancel()
-
 	var animal models.Animal
 
+	//get the url parameter and throw an error if its empty
 	animal_id := c.Param("animal_id")
 	if animal_id == "" {
 		msg := "Invalid parameter"
@@ -199,6 +214,8 @@ func UpdateAnimalHandler(c *gin.Context) {
 		})
 	}
 
+	// match animal_id gotter from the url with the animal_id in the database
+	//and chek if there is an error
 	animals_id, err := primitive.ObjectIDFromHex(animal_id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -207,6 +224,7 @@ func UpdateAnimalHandler(c *gin.Context) {
 		return
 	}
 
+	//bind all of the provided datas togeter and handler errors if any
 	if err := c.BindJSON(&animal); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
@@ -214,8 +232,10 @@ func UpdateAnimalHandler(c *gin.Context) {
 		return
 	}
 
+	//set up a mongodb query which queries the data- animal_id
 	filter := bson.D{primitive.E{Key: "_id", Value: animals_id}}
 
+	//speifying the fields available for update
 	update := bson.D{
 		{Key: "$set", Value: bson.D{primitive.E{Key: "name", Value: animal.Name},
 			{Key: "desc", Value: animal.Description},
@@ -242,6 +262,8 @@ func UpdateAnimalHandler(c *gin.Context) {
 			{Key: "mode_of_birth", Value: animal.ModeOfBirth},
 		}}}
 
+	//only the error that is needed
+	//try to update a specific animal data and if an error occured, handler the error
 	_, err = animalCollection.UpdateOne(ctx, filter, update)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -252,6 +274,7 @@ func UpdateAnimalHandler(c *gin.Context) {
 
 	ctx.Done()
 
+	//if everything goes fine output some information to the user at to what has been updated
 	c.JSON(http.StatusOK, gin.H{
 		"name":    animal.Name,
 		"desc":    animal.Description,
@@ -260,9 +283,12 @@ func UpdateAnimalHandler(c *gin.Context) {
 }
 
 func DeleteAnimalHandler(c *gin.Context) {
+	//open up a dataase connection
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	//close that connection on the insertion is done
 	defer cancel()
 
+	//get the url parameter and throw an error if its empty
 	animal_id := c.Param("animal_id")
 	if animal_id == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -271,6 +297,8 @@ func DeleteAnimalHandler(c *gin.Context) {
 		return
 	}
 
+	// match animal_id gotter from the url with the animal_id in the database
+	//and chek if there is an error
 	animals_id, err := primitive.ObjectIDFromHex(animal_id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -279,7 +307,11 @@ func DeleteAnimalHandler(c *gin.Context) {
 		return
 	}
 
+	//set up a mongodb query which queries the data- animal_id
 	filter := bson.D{primitive.E{Key: "_id", Value: animals_id}}
+
+	//only the error that is needed
+	//try to delete a specific animal data and if an error occured, handler the error
 	_, err = animalCollection.DeleteOne(ctx, filter)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -289,8 +321,65 @@ func DeleteAnimalHandler(c *gin.Context) {
 	}
 	ctx.Done()
 
+	//if everything goes fine
+	//let the user know that the animal data has been successfully deleted with the animal_id
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Successfully deleted animal with the provided ID",
 		"animal":  animals_id,
 	})
+}
+
+func SearchAnimalHandler(c *gin.Context) {
+	//open up a dataase connection
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	//close that connection on the insertion is done
+	defer cancel()
+
+	//declear a variable which holds the animal models
+	var animal []models.Animal
+
+	//get the providel query parameter from the url
+	//and if the query paramater is empty throw an error
+	query := c.Query("search")
+	if query == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid parameter",
+		})
+		return
+	}
+
+	//searh the database to get a match for the  query paramater the user provided
+	//and if there was an error, handle it
+	queryAnimal, err := animalCollection.Find(ctx, bson.M{"name": bson.M{"$regex": query}})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Something went wrong",
+		})
+		return
+	}
+
+	//Get all the possible match of the query parameter the user entered
+	//and if there is an error, handle it
+	if err := queryAnimal.All(ctx, &animal); err != nil {
+		msg := "Something went wrong while trying to find all the names"
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": msg,
+		})
+	}
+	defer queryAnimal.Close(ctx)
+
+	//if there is an while trying to get all the related data throw an error
+	if err := queryAnimal.Err(); err != nil {
+		msg := "Invalid request"
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": msg,
+		})
+		return
+	}
+
+	//if everything goes fine show the list of all the match from the database
+	c.JSON(http.StatusOK, gin.H{
+		"animal": animal,
+	})
+
 }
