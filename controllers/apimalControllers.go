@@ -18,7 +18,7 @@ import (
 var animalCollection *mongo.Collection = database.OpenCollection(database.Client, "animal")
 var validate = validator.New()
 
-func CreateHandler(c *gin.Context) {
+func CreateAnimalHandler(c *gin.Context) {
 	//open up a dataase connection
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	//close that connection on the insertion is done
@@ -96,5 +96,49 @@ func CreateHandler(c *gin.Context) {
 		"desc":      animal.Description,
 		"image":     animal.Image,
 		"animal_id": insert,
+	})
+}
+
+func GetAnimalsHandler(c *gin.Context) {
+	//opens a database connection
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	//close that connection after user
+	defer cancel()
+
+	//declear an aniamls variable ro hold an array of the animal model
+	var animals []models.Animal
+
+	//declear a variable to find all the datas in the database
+	//check if there is an error and handle that error appropriately
+	cusor, err := animalCollection.Find(ctx, bson.D{})
+	if err != nil {
+		log.Panic(err)
+		msg := "Sorry, something went wrong. Please try again later"
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": msg,
+		})
+		return
+	}
+
+	//user the initially create varivale to finc all the aninmal data and handle the
+	// error if any
+	if err = cusor.All(ctx, &animals); err != nil {
+		log.Panic(err)
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+	//close the connection
+	defer cusor.Close(ctx)
+
+	//check if there is an error in retrieving the animal datas
+	if err := cusor.Err(); err != nil {
+		log.Panic(err)
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+
+	//list out the animal datas found
+	c.JSON(http.StatusOK, gin.H{
+		"animal": animals,
 	})
 }

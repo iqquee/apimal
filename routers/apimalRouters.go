@@ -17,8 +17,8 @@ func InitRouters() {
 	router := gin.Default()
 	animal := router.Group("/animal")
 	{
-		animal.POST("/create", controllers.CreateHandler)
-		animal.GET("/animals")
+		animal.POST("/create", controllers.CreateAnimalHandler)
+		animal.GET("/animals", controllers.GetAnimalsHandler)
 		animal.GET("/:animal_id")
 	}
 
