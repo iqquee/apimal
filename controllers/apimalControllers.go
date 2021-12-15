@@ -148,15 +148,23 @@ func GetAnimalHandler(c *gin.Context) {
 	defer cancel()
 
 	var animal models.Animal
-	animal_id, err := primitive.ObjectIDFromHex(c.Param("animal_id"))
-	if err != nil {
+	animal_id := c.Param("animal_id")
+	if animal_id == "" {
+		msg := "Invalid parameter"
 		c.JSON(http.StatusBadRequest, gin.H{
+			"error": msg,
+		})
+		return
+	}
+	animals_id, err := primitive.ObjectIDFromHex(animal_id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
 		return
 	}
 
-	animalResult := animalCollection.FindOne(ctx, bson.M{"_id": animal_id})
+	animalResult := animalCollection.FindOne(ctx, bson.M{"_id": animals_id})
 	if err := animalResult.Err(); err != nil {
 		c.JSON(http.StatusNotFound, gin.H{
 			"error": err.Error(),
@@ -175,4 +183,78 @@ func GetAnimalHandler(c *gin.Context) {
 		"animal": animal,
 	})
 
+}
+
+func UpdateAnimalHandler(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	var animal models.Animal
+
+	animal_id := c.Param("animal_id")
+	if animal_id == "" {
+		msg := "Invalid parameter"
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": msg,
+		})
+	}
+
+	animals_id, err := primitive.ObjectIDFromHex(animal_id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	if err := c.BindJSON(&animal); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	filter := bson.D{primitive.E{Key: "_id", Value: animals_id}}
+
+	update := bson.D{
+		{Key: "$set", Value: bson.D{primitive.E{Key: "name", Value: animal.Name},
+			{Key: "desc", Value: animal.Description},
+			{Key: "image", Value: animal.Image},
+			{Key: "habitat", Value: animal.Habitat},
+			{Key: "domain", Value: animal.Domain},
+			{Key: "kingdom", Value: animal.Kingdom},
+			{Key: "phylum", Value: animal.Phylum},
+			{Key: "class", Value: animal.Class},
+			{Key: "order", Value: animal.Order},
+			{Key: "family", Value: animal.Family},
+			{Key: "genus", Value: animal.Genus},
+			{Key: "specie", Value: animal.Specie},
+			{Key: "color", Value: animal.Color},
+			{Key: "predator", Value: animal.Predator},
+			{Key: "food_type", Value: animal.FoodType},
+			{Key: "ovulation_period", Value: animal.OvuationPeriod},
+			{Key: "gestation_period", Value: animal.GestationPeriod},
+			{Key: "extimated_population", Value: animal.EstimatedPopulation},
+			{Key: "extinction_status", Value: animal.ExtinctionStatus},
+			{Key: "reproduction", Value: animal.Reproduction},
+			{Key: "motility", Value: animal.Motility},
+			{Key: "mating_season", Value: animal.MatingSeason},
+			{Key: "mode_of_birth", Value: animal.ModeOfBirth},
+		}}}
+
+	_, err = animalCollection.UpdateOne(ctx, filter, update)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	ctx.Done()
+
+	c.JSON(http.StatusOK, gin.H{
+		"name":    animal.Name,
+		"desc":    animal.Description,
+		"message": "successfully updated the animal detail",
+	})
 }

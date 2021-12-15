@@ -7,6 +7,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
+//the init function gets called before the main function
 func init() {
 	if err := godotenv.Load(); err != nil {
 		log.Println("Error loading .env file")
@@ -14,5 +15,6 @@ func init() {
 }
 
 func main() {
+	//leads to the routers package
 	routers.InitRouters()
 }
