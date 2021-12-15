@@ -19,7 +19,7 @@ func InitRouters() {
 	{
 		animal.POST("/create", controllers.CreateAnimalHandler)
 		animal.GET("/animals", controllers.GetAnimalsHandler)
-		animal.GET("/:animal_id")
+		animal.GET("/:animal_id", controllers.GetAnimalHandler)
 	}
 
 	router.Run(":" + port)

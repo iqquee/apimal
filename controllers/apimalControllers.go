@@ -40,7 +40,7 @@ func CreateAnimalHandler(c *gin.Context) {
 	validateErr := validate.Struct(&animal)
 	if validateErr != nil {
 		// log.Panic(validateErr)
-		msg := "Some fields are left blank"
+		msg := "Some fields are left blank or the description is too small"
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": msg,
 		})
@@ -141,4 +141,38 @@ func GetAnimalsHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"animal": animals,
 	})
+}
+
+func GetAnimalHandler(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	var animal models.Animal
+	animal_id, err := primitive.ObjectIDFromHex(c.Param("animal_id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	animalResult := animalCollection.FindOne(ctx, bson.M{"_id": animal_id})
+	if err := animalResult.Err(); err != nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	if err := animalResult.Decode(&animal); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"animal": animal,
+	})
+
 }
