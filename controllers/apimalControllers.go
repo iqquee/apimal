@@ -258,3 +258,39 @@ func UpdateAnimalHandler(c *gin.Context) {
 		"message": "successfully updated the animal detail",
 	})
 }
+
+func DeleteAnimalHandler(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	animal_id := c.Param("animal_id")
+	if animal_id == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid parameter",
+		})
+		return
+	}
+
+	animals_id, err := primitive.ObjectIDFromHex(animal_id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	filter := bson.D{primitive.E{Key: "_id", Value: animals_id}}
+	_, err = animalCollection.DeleteOne(ctx, filter)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Something went wrong while deleting the data",
+		})
+		return
+	}
+	ctx.Done()
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Successfully deleted animal with the provided ID",
+		"animal":  animals_id,
+	})
+}
