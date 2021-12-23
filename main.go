@@ -9,6 +9,7 @@ import (
 
 //the init function gets called before the main function
 func init() {
+	//Load the .env file
 	if err := godotenv.Load(); err != nil {
 		log.Println("Error loading .env file")
 	}

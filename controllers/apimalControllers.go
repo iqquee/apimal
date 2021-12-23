@@ -71,7 +71,7 @@ func CreateAnimalHandler(c *gin.Context) {
 
 	//add a created at time to the animal data to be created
 	animal.CreatedAt, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
-	// animal.UpdatedAt, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
+	animal.UpdatedAt, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
 
 	//Init a mongodb default id for the Id fields in the models
 	animal.ID = primitive.NewObjectID()
@@ -214,6 +214,8 @@ func UpdateAnimalHandler(c *gin.Context) {
 		})
 	}
 
+	animal.UpdatedAt, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
+
 	// match animal_id gotter from the url with the animal_id in the database
 	//and chek if there is an error
 	animals_id, err := primitive.ObjectIDFromHex(animal_id)
@@ -276,9 +278,10 @@ func UpdateAnimalHandler(c *gin.Context) {
 
 	//if everything goes fine output some information to the user at to what has been updated
 	c.JSON(http.StatusOK, gin.H{
-		"name":    animal.Name,
-		"desc":    animal.Description,
-		"message": "successfully updated the animal detail",
+		"name":       animal.Name,
+		"desc":       animal.Description,
+		"updated_at": animal.UpdatedAt,
+		"message":    "successfully updated the animal detail",
 	})
 }
 
