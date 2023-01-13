@@ -4,7 +4,7 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
-	"github.com/hisyntax/apimal/controllers"
+	"github.com/iqquee/apimal/controllers"
 )
 
 func InitRouters() {

@@ -3,11 +3,11 @@ package main
 import (
 	"log"
 
-	"github.com/hisyntax/apimal/routers"
+	"github.com/iqquee/apimal/routers"
 	"github.com/joho/godotenv"
 )
 
-//the init function gets called before the main function
+// the init function gets called before the main function
 func init() {
 	//Load the .env file
 	if err := godotenv.Load(); err != nil {

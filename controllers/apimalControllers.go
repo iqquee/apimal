@@ -8,8 +8,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator"
-	"github.com/hisyntax/apimal/database"
-	"github.com/hisyntax/apimal/models"
+	"github.com/iqquee/apimal/database"
+	"github.com/iqquee/apimal/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
